@@ -1,0 +1,33 @@
+/**
+ * ::backdrop => Dialogの背景(Overlay)の疑似要素
+ * :modal     => DialogタグをshowModal()で表示した際の疑似セレクタ
+ */
+
+.dialog {
+    padding: 0;
+}
+
+.dialog::backdrop {
+    opacity: 0;
+    background: rgba(0, 0, 0, 0.5);
+}
+
+.dialog:modal::backdrop {
+    opacity: 1;
+    animation: fadein 0.15s ease-in;
+    /** backdropに表示アニメーションを付与 */
+}
+
+@keyframes fadein {
+    0% {
+        opacity: 0;
+    }
+
+    100% {
+        opacity: 1;
+    }
+}
+
+.content {
+    padding: 1em;
+}

@@ -1,0 +1,21 @@
+.triangle {
+    margin-left: 5px;
+    margin-top: 10px;
+    width: 40px;
+    height: 40px;
+    clip-path: polygon(0 0, 0% 100%, 100% 50%);
+    background-color: black;
+    border: 2px solid white;
+    box-shadow: 0 0 0 2px white;
+}
+
+.background {
+    background-color: black;
+    background-size: cover;
+    background-position: center;
+}
+
+#choicesText {
+    margin-left: 50px;
+    font-size: 15px;
+}
