@@ -1,0 +1,10 @@
+diffusers
+transformers
+ftfy
+accelerate
+omegaconf
+
+flask
+Flask-Caching
+
+firebase_admin
