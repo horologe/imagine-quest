@@ -1,8 +1,9 @@
 import React, { useState, useEffect, useContext } from "react";
 import { useNavigate } from "react-router-dom";
-import { Box, Button, Stack, Grid } from "@mui/material";
+import { Box, Stack } from "@mui/material";
 import * as photos from "../screenPicture";
-import { ImageToButton } from "./ImageToButton";
+import { ImageToButton } from "./ui/ImageToButton";
+import { HomeHeader } from "./ui/headers";
 
 function Home() {
   const navigate = useNavigate();
@@ -11,9 +12,6 @@ function Home() {
   };
   const characterChoice = () => {
     navigate("/characterChoose");
-  };
-  const home = () => {
-    navigate("/");
   };
 
   return (
@@ -30,63 +28,7 @@ function Home() {
             overflow: "hidden",
           }}
         >
-          <Box
-            sx={{
-              position: "sticky",
-              top: 0,
-              width: "100vw",
-              height: "80px",
-              backgroundColor: "#333333",
-              padding: "8px 0 0 25px",
-              zIndex: 1,
-            }}
-          >
-            <Stack direction={"row"} justifyContent="space-between">
-              <Stack direction={"row"} spacing={"50px"} marginTop={1}>
-                <img src={photos.logo} alt={"logo"} height={60} />
-                <Box>
-                  <Stack alignItems={"center"} spacing={1}>
-                    <ImageToButton
-                      src={photos.header_home}
-                      alt={"home"}
-                      onClick={home}
-                      height={36}
-                      width={95}
-                    />
-                    <ImageToButton
-                      src={photos.header_bar}
-                      alt={"bar"}
-                      onClick={home}
-                      height={5}
-                    />
-                  </Stack>
-                </Box>
-                <Box>
-                  <ImageToButton
-                    src={photos.header_charactar}
-                    alt={"character"}
-                    onClick={characterChoice}
-                    height={36}
-                    width={142}
-                  />
-                </Box>
-              </Stack>
-              <Box textAlign={"center"} marginRight={"80px"} marginTop={"15px"}>
-                <Button
-                  style={{
-                    backgroundColor: "white",
-                    color: "black",
-                    fontSize: "15px",
-                    width: "120px",
-                    height: "80",
-                  }}
-                  onClick={() => navigate("/logout")}
-                >
-                  SignOut
-                </Button>
-              </Box>
-            </Stack>
-          </Box>
+          <HomeHeader isHome={true} />
           <Box marginTop={30}>
             <Stack direction={"row"}>
               <Box

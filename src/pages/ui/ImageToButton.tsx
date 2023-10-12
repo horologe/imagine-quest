@@ -16,21 +16,24 @@ export const ImageToButton: FC<ImageToButtonProps> = ({
   height = 50,
   changeColor = false,
 }) => {
-  // useStateを使ってボタンの色を管理する
   const [buttonColor, setButtonColor] = useState("");
-  // ボタンがクリックされたときの処理を定義する
   const handleClick = () => {
     if (changeColor) {
       const colors = "#4682b4";
       setButtonColor(colors);
-    } // onClickに渡された関数を実行する
+    }
     onClick();
   };
 
   return (
     <Button
       onClick={handleClick}
-      style={{ backgroundColor: buttonColor, width: width, height: height }}
+      style={{
+        backgroundColor: buttonColor,
+        width: width,
+        height: height,
+        zIndex: 0,
+      }}
     >
       {" "}
       <img src={src} alt={alt} width={width} height={height} />{" "}

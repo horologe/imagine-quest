@@ -57,3 +57,7 @@ export { default as door } from "./door.png";
 export { default as arrow_left } from "./arrow_left.png";
 export { default as arrow_right } from "./arrow_right.png";
 export { default as reload } from "./reload.png";
+export { default as back_arrow } from "./back_arrow.png";
+export { default as plus } from "./plus.png";
+export { default as vector } from "./vector.png";
+export { default as nowLoading } from "./nowLoading.png";

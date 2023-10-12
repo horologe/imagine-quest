@@ -1,15 +1,14 @@
 import React, { useState, useContext, useEffect } from "react";
-import ChatArea from "../components/ChatArea";
 import { useNavigate } from "react-router-dom";
-import Title from "./ImagineQuestWord.png";
-import { Box, Button, Stack, TextField, Grid } from "@mui/material";
+import { Box, Stack, TextField } from "@mui/material";
 import { PlayCharacterContext } from "../App";
 import { playCharacterImgContext } from "../App";
-import { getAiMessage, jp2en, generateImage } from "../lib/api";
-import * as OpenAIEnv from "../lib/apienv";
-import { ImageToButton } from "./ImageToButton";
+import { generateImage } from "../lib/api";
+import { ImageToButton } from "./ui/ImageToButton";
 import * as photos from "../screenPicture";
-import { DecideButton } from "./buttons";
+import { DecideButton } from "./ui/buttons";
+import CircularProgress from "@mui/material/CircularProgress";
+import { NomalHeader } from "./ui/headers";
 
 type CharacterMaking = {
     playerName: string | null;
@@ -25,84 +24,82 @@ function CharacterMaking({ playerName, handleChangeName }: CharacterMaking) {
     );
     const [pictureBase64, setPictureBase64] = useState<string>("");
     const [playerNameText, setPlayerNameText] = useState<string>("");
+    const [isLoading, setIsLoading] = useState(false);
 
     const navigate = useNavigate();
     const handleStart = () => {
-        setPlayCharacterSaveText(playerFeaturesText);
-        setPlayerCharacterImg(pictureBase64);
-        navigate("/WorldMaking");
+        if (playerName != "" && pictureBase64 != "") {
+            setPlayCharacterSaveText(playerFeaturesText);
+            setPlayerCharacterImg(pictureBase64);
+            navigate("/WorldMaking");
+        } else {
+            alert("キャラ名、またはキャラの写真がセットされていません。");
+        }
     };
     const handlerPlayerChoice = () => {
         navigate("/PlayerChoice");
     };
 
-    const handleSubmit = async (e: React.MouseEvent<HTMLButtonElement>) => {
-        setPlayerCharacterImg("generating...")
-        setPictureBase64(
-            await generateImage("{master piece:1.2}," + playerFeaturesText, 512, 512)
+    const handleSubmit = async () => {
+        setIsLoading(true);
+        console.log("クリックされた!");
+        const picture = await generateImage(
+            "{master piece:1.2}," + PlayCharacterSaveText,
+            512,
+            512
         );
-        setPlayerCharacterImg(pictureBase64);
+        setPictureBase64(picture);
+        setIsLoading(false);
+        setPlayerCharacterImg(picture);
 
         console.log(PlayerCharacterImg);
     };
-    const choicesBoxStyle2 = {
-        mt: 8,
-        width: "300",
-        height: "400",
-        color: "white",
-        background: "black",
-        border: 2,
-        textAlign: "center",
-    };
-    useEffect(() => { // useEffect内でasync関数を定義する 
+
+    useEffect(() => {
         const fetchImage = async () => {
-            setPlayerFeaturesText(PlayCharacterSaveText);
-            const newPlayerCharacterSaveText = playerFeaturesText; setPictureBase64(await generateImage("{master piece:1.2}," + newPlayerCharacterSaveText, 512, 512));
+            setIsLoading(true);
+            setPictureBase64(
+                await generateImage(
+                    "{master piece:1.2}," + PlayCharacterSaveText,
+                    512,
+                    512
+                )
+            );
+            setIsLoading(false);
             setPlayerCharacterImg(pictureBase64);
-        }; // 定義したasync関数を呼び出す 
+        };
         fetchImage();
     }, []);
-    const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        setPlayerFeaturesText(e.target.value);
-    };
     return (
         <>
             <Stack spacing={2}>
-                <Box
-                    sx={{
-                        width: "100vw",
-                        height: "70px",
-                        backgroundColor: "#333333",
-                        paddingTop: "8px",
-                        paddingLeft: "25px",
-                    }}
-                >
-                    <Stack direction={"row"} spacing={3}>
-                        <ImageToButton
-                            src={photos.back}
-                            alt={"home"}
-                            onClick={handlerPlayerChoice}
-                            height={60}
-                            width={60}
-                        />
-                        <Box fontSize={30} paddingTop={0.8}>
-                            キャラ生成
-                        </Box>
-                    </Stack>
-                </Box>
-                {/*以下*/}
+                <NomalHeader navigateTo={handlerPlayerChoice} pageName="キャラ生成" />
                 <Box paddingLeft={20}>
                     <Stack direction={"row"} spacing={10}>
-                        <Stack direction={"column"} spacing={2}>
-                            <Box>{PlayCharacterSaveText}</Box>
-                            <Box
-                                component="img"
-                                sx={{ width: 512, height: 512 }}
-                                src={pictureBase64}
-                            />
-                        </Stack>
+                        <Box
+                            sx={{
+                                display: "flex",
+                                alignItems: "center",
+                                justifyContent: "center",
+                                width: 512,
+                                height: 512,
+                            }}
+                        >
+                            {isLoading ? (
+                                <CircularProgress />
+                            ) : (
+                                // 画像を表示
+                                <>
+                                    <Box
+                                        component="img"
+                                        sx={{ width: 512, height: 512 }}
+                                        src={pictureBase64}
+                                    />
+                                </>
+                            )}
+                        </Box>
                         <Stack direction={"column"} justifyContent="space-between">
-                            <Box></Box>
+                            <Box>{PlayCharacterSaveText}</Box>
                             <Stack>
                                 <TextField
                                     label="プレイヤー名"
@@ -116,7 +113,7 @@ function CharacterMaking({ playerName, handleChangeName }: CharacterMaking) {
                                             <ImageToButton
                                                 src={photos.reload}
                                                 alt={"reload"}
-                                                onClick={() => handleSubmit}
+                                                onClick={handleSubmit}
                                                 width={100}
                                                 height={100}
                                             />

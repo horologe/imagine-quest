@@ -32,9 +32,6 @@ export const CHARAMAKING_SYSTEM_PROMPT = "You are a professional screenwriter an
 export function gameChoice(main: number, sub: number) {
     gameType = main;
     genre = sub;
-    if (gameType == 1 && genre == 1) {
-        gameType = 0;
-    }
     setPrompt()
 }
 
@@ -87,19 +84,27 @@ function setPrompt() {
                     EXAMPLE_TEXT = "The spacecraft plunged into the cloud layer. Immediately, the cockpit windows fogged up white and the radar screen was filled with noise. It was as if we had entered another dimension. Vibrant colors flooded out of the clouds, weaving a fantastic scene. Red, blue, green, and purple lights poured onto the spaceship through the clouds, giving it the feeling of crossing a rainbow bridge."
                     break;
                 case 1:
-                    GAME_KINDS = "サイバーパンクな世界の世界崩壊。"
-                    STAGE_INFORMATION = "";
-
+                    GAME_KINDS = "A small drone that tracks the humanoid android protagonist and provides the protagonist with visual information and news around the protagonist."
+                    STAGE_INFORMATION = "It is a near-future world of advanced science and technology mixed with low social order. In this world, technologies such as artificial intelligence, cybernetics and hacking are advanced, but at the same time, problems such as the gap between rich and poor, crime and pollution are becoming more serious.";
+                    stage = "Near-future buildings in the city"
+                    ATTENTION_TEXT = "**You should speak with an emphasis on being a drone that supports the protagonist by providing visual information and news related to the case you are currently tracking.**"
+                    EXAMPLE_TEXT = "You have just finished work as usual and are walking out of your work office when all of a sudden there is a roar from the sky. You look up at the sky and see a huge explosion. Flames and smoke stain the sky. At the center of the explosion is a robot shaped like a beast with sharp claws and fangs. The robot roars amidst the bloody corpses and ruins. The robot was created by criminals and attacks humans and androids indiscriminately."
                     break;
                 case 2:
+                    GAME_KINDS = "Adventures in the Phantom Sea"
+                    STAGE_INFORMATION = "I, the submarine pilot, and you, the commander, are on a submarine exploring the bottom of an unknown ocean. It is rumored that the remains of an ancient civilization remain at the bottom of that ocean, and that treasures lie there. However, until we reach the ruins, we encounter various troubles in space. In order to successfully break through that undersea space, I must accurately explain the current situation to my pilot, with emphasis on visual information.";
+                    stage = "Mystery Big Ocean"
+                    ATTENTION_TEXT = "It would be interesting to use not only things that actually exist in the ocean, but also fantastical things as troubles to create a sense of realism. Whether it is unknown marine creatures such as mermaids or kraken, or advanced equipment and systems for underwater exploration and communication, use anything you can think of as a possible trouble in an underwater submarine exploration as appropriate. However, be sure to think of a way to escape as the pilot-in-command."
+                    EXAMPLE_TEXT = "The current depth is 500 meters. The water temperature is 10 degrees Celsius. The submarine is in good condition. Nothing is showing up on radar. However, there are rumors of unknown marine life in the area, including mermaids and kraken. If you encounter them, use the submarine's weapon system to fight them off."
                     break;
             }
             break;
         case 2:
 
-            GAME_KINDS = "Artificial Intelligence for a bird's eye view of human society"
             switch (genre) {
                 case 0:
+
+                    GAME_KINDS = "Artificial Intelligence for a bird's eye view of human society"
                     STAGE_INFORMATION = "I belong to a company with a lot of work and a very strict attitude of my boss, and you, as an artificial intelligence, are observing how I am managing to survive.I am going through a number of hardships that may cause me to have a mental breakdown, but I am trying my best to survive by making a number of choices. You must describe in detail your current visual situation.";
                     GAME_RULES = ""
                     stage = "the Company Office"
@@ -107,14 +112,26 @@ function setPrompt() {
                     EXAMPLE_TEXT = "You are sitting in your office at work. In front of you are a computer and a telephone. On the computer screen are documents for a project that is about to be due. The phone rings from time to time with requests and complaints from your boss and clients. You are so busy that you feel dizzy.The air in the office is heavy. The air conditioner is out of order; it is hot and stifling. The windows cannot be opened. There are posters on the walls with the company's philosophy and goals, but they are meaningless to you. There are no smiles or laughter in the office. It is not easy to survive in this company."
                     break;
                 case 1:
+
+                    GAME_KINDS = "A test of courage for the protagonist, an elementary school student, and his friend, you, at an abandoned school."
+                    STAGE_INFORMATION = "As an elementary school student, my friends and I decided to challenge ourselves to a test of courage. There is a rumor that ghosts and monsters appear in abandoned schools.Inside the abandoned school are classrooms and music rooms that were once used, learning facilities such as a library, reference room, and art room, and living facilities such as a school lunchroom, infirmary, and science room. In the music room, you may hear the sound of a piano even though no one is supposed to be there, and in the science room, there may be a human body model that moves on its own.";
+                    GAME_RULES = ""
+                    stage = "abolition of a school"
+                    ATTENTION_TEXT = "This is a story of a liver test for you and me, and you need to describe to me primarily the visual information of the place where we are now located. It begins with us being in front of a frightening abandoned school. Please visually describe the calamity that befalls me. It is not easy to make a safe round of this abandoned school. It is a terrifying test of courage in which we may hear voices, music, and mechanical activity in the school, see ghosts, and poltergeists that may endanger us."
+                    EXAMPLE_TEXT = "The abandoned school, located in the middle of a mountain, stands alone in a quiet and secluded place. The wooden building is deteriorating, with cracks and holes in the walls and windows. The roof is covered with moss and leaves, and the floor is streaked with the remains of leaks. The place where children's laughter would once have echoed is now only littered with dilapidated playground equipment and benches."
                     break;
                 case 2:
+
+                    GAME_KINDS = "Artificial Intelligence for a bird's eye view of human society"
+                    STAGE_INFORMATION = "I am a technical college student who is busy with a report due tomorrow. The time is still 8:00 a.m. Japan time and there is still some time left before the deadline, tomorrow noon. I am trying my best to write the report, but the temptation of video games, contact from friends, and various other troubles are threatening my report writing. Please help me by providing me with a visual description of the situation.";
+                    GAME_RULES = ""
+                    stage = "my house"
+                    ATTENTION_TEXT = "Try to describe alternating situations in which it is possible to make a verbatim report and situations in which it is difficult to make a report. And this story begins with me, the main character, waking up at home at 8 am on a holiday morning. Tomorrow I have to go to a technical college. It takes one hour to get to the technical college. Please proceed the story to the standard of life of an average high school student. ***If you work on your report until midnight, it is recommended that you get your hands on an energy drink. ***If I fail to produce a report, I will lose credits for my technical college grade and my student life will be over.The main character has a dream of a technical college life in a happy family with a mother and father."
+                    EXAMPLE_TEXT = "You woke up to the morning sun. The light shining through the curtains was dazzling. You got off the bed and looked around the room. On his desk were piles of books and notebooks for his report. With a heavy heart, you decided to start writing the report. The report was important because it would count toward your credits at the technical college. You started up your computer and began to rearrange the materials."
                     break;
             }
             break;
-        case 3:
 
-            break;
     }
 }
 

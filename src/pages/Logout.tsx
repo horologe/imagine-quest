@@ -2,35 +2,27 @@ import { signOut } from "firebase/auth";
 import React from "react";
 import { useNavigate } from "react-router-dom";
 import { auth } from "../firebase/firebase";
-import {
-    Box,
-    Button,
-    ButtonBase,
-    Stack,
-    TextField,
-    Grid,
-    Typography,
-    Fab,
-  } from "@mui/material";
+import { Box, Button, Stack } from "@mui/material";
 import * as photos from "../screenPicture";
+import { LogInButton } from "./ui/buttons";
 
 type LogoutProps = {
-    setIsAuth: (isAuth: boolean) => void;
+  setIsAuth: (isAuth: boolean) => void;
 };
 const Logout = ({ setIsAuth }: LogoutProps) => {
-    const navigate = useNavigate();
-    const logout = () => {
-        // ログアウト
-        signOut(auth).then(() => {
-            // ローカルストレージからisAuth削除
-            localStorage.clear();
-            setIsAuth(false); //状態を変更
-        });
-        // ログインにとばす
-        navigate("/login");
-    };
-    return (
-        <div>
+  const navigate = useNavigate();
+  const logout = () => {
+    // ログアウト
+    signOut(auth).then(() => {
+      // ローカルストレージからisAuth削除
+      localStorage.clear();
+      setIsAuth(false); //状態を変更
+    });
+    // ログインにとばす
+    navigate("/login");
+  };
+  return (
+    <div>
       <Stack
         direction="column"
         alignItems={"center"}
@@ -50,22 +42,16 @@ const Logout = ({ setIsAuth }: LogoutProps) => {
             </Box>
             <p>ログアウトしますか？</p>
             {/* メールとパスワードを入力させるためのフォームを作る */}
-              <form onSubmit={logout}>
-                <Stack direction={"column"} spacing={1}>
-                  <Box height={55} bgcolor={"#A8BF54"} textAlign={"center"}>
-                    <Button type="submit">
-                      <Box fontSize={20} color={"white"} textAlign={"center"}>
-                        ログアウト
-                      </Box>
-                    </Button>
-                  </Box>
-                </Stack>
-              </form>
+            <form onSubmit={logout}>
+              <Stack direction={"column"} spacing={1}>
+                <LogInButton tag="ログアウト" bgColor="#A8BF54" />
+              </Stack>
+            </form>
           </Stack>
         </Box>
       </Stack>
     </div>
-    );
+  );
 };
 
 export default Logout;

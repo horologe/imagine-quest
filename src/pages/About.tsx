@@ -1,20 +1,12 @@
 import React, { useEffect, useState, useContext } from "react";
 import "../App.css";
 import { useNavigate } from "react-router-dom";
-import { MuiFileInput } from "mui-file-input";
-import {
-  Box,
-  Button,
-  Container,
-  Grid,
-  TextField,
-  Typography,
-  Stack,
-} from "@mui/material"; //ReactのUI使えるライブラリ
+import { Box, Stack } from "@mui/material";
 import { PrologueContext } from "../App";
 import { playCharacterImgContext } from "../App";
 import { getAiMessage } from "../lib/api";
 import * as OpenAIEnv from "../lib/apienv";
+import { RightGreenButton } from "./ui/buttons";
 
 type AboutProps = {
   file: File | null;
@@ -34,6 +26,7 @@ function About({
   const { PlayerCharacterImg, setPlayerCharacterImg } = useContext(
     playCharacterImgContext
   );
+  const [isLoading, setIsLoading] = useState(true);
   useEffect(() => {
     console.log("generating..");
     getAiMessage(
@@ -60,7 +53,7 @@ function About({
             res.data.choices[0].message?.function_call?.arguments as string
           )["Story Prologue to the Adventure"]
         );
-        // setsquareText(res.data.choices[0].message);
+        setIsLoading(false);
       })
       .catch((e) => setsquareText("an error happened"));
   }, []);
@@ -73,7 +66,6 @@ function About({
     navigate("/contact");
   };
   return (
-    // Gridコンテナの親要素に高さを指定する場合
     <div style={{ height: "100vh" }}>
       <Stack direction={"column"}>
         <Box padding={10}>
@@ -93,22 +85,17 @@ function About({
               {restText}
             </pre>
           </Box>
-          <Stack direction={"row"} justifyContent={"space-between"}>
-            <Box></Box>
-            <Button
-              onClick={handleStart}
-              variant="contained"
-              sx={{
-                mt: 2,
-                backgroundColor: "#4DC2B1",
-                "&:hover": {
-                  backgroundColor: "#4B5855",
-                },
-              }}
-            >
-              <Box fontSize={30}> 次へ</Box>
-            </Button>
-          </Stack>
+          {isLoading ? (
+            <></>
+          ) : (
+            <Stack direction={"row"} justifyContent={"space-between"}>
+              <Box></Box>
+              <RightGreenButton
+                tag="次へ!"
+                onClickHandler={() => handleStart()}
+              />
+            </Stack>
+          )}
         </Box>
       </Stack>
     </div>

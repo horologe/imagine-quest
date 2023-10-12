@@ -5,9 +5,9 @@ import React, {
   Dispatch,
   SetStateAction,
 } from "react"; // useEffectをインポートする import ChatArea from “…/components/ChatArea”; import { useNavigate } from “react-router-dom”; import Title from “./ImagineQuestWord.png”; import { Box, Button, Stack } from “@mui/material”; import { doc, getDocs, collection, query, where, } from “firebase/firestore”; import { db } from “…/firebase/firebase”;
+import { useDialog } from "../dialog";
 import { useNavigate } from "react-router-dom";
-import Title from "./ImagineQuestWord.png";
-import { Box, Button, Stack, Grid } from "@mui/material";
+import { Box, Button, Stack, Grid, Typography } from "@mui/material";
 import {
   getDocs,
   collection,
@@ -22,17 +22,22 @@ import { PlayCharacterContext } from "../App";
 import { playCharacterImgContext } from "../App";
 import { useCharacterIndexContext } from "../App";
 import * as photos from "../screenPicture";
-import { ImageToButton } from "./ImageToButton";
+import { ImageToButton } from "./ui/ImageToButton";
+import { HomeHeader } from "./ui/headers";
 
 type charaProps = {
   playerName: string | null;
   setPlayerName: Dispatch<SetStateAction<string | null>>;
 };
 function CharacterChoose({ playerName, setPlayerName }: charaProps) {
+  const { Dialog, open: openDialog, close: closeDialog } = useDialog();
   const [isStarted, setIsStarted] = useState(false);
   const [characterArray, setCharacterArray] = useState<DocumentData[] | null>(
     null
   );
+  const [dialogWidth, setDialogWidth] = useState<number>(0);
+  const [dialogHeight, setDialogHeight] = useState<number>(0);
+  const [clearCountSave, setClearCount] = useState<string>("");
   const { saveEmail, setSaveEmail } = useContext(emailContext);
   const { useCharacter, setUseCharacter } = useContext(useCharacterContext);
   const { PlayCharacterSaveText, setPlayCharacterSaveText } =
@@ -40,11 +45,64 @@ function CharacterChoose({ playerName, setPlayerName }: charaProps) {
   const { PlayerCharacterImg, setPlayerCharacterImg } = useContext(
     playCharacterImgContext
   );
-
+  const [preservePictureBase64, setPreservePictureBase64] = useState<string[]>(
+    []
+  );
+  const [preserveText, setPreserveText] = useState<string[]>([]);
+  const [preserveChoices, setPreserveChoices] = useState<string[]>([]);
+  const [prologueText, setPrologueText] = useState<string>("");
   const { useCharacterIndex, setUseCharacterIndex } = useContext(
     useCharacterIndexContext
   );
+  const [detailID, setDetailID] = useState("");
+  const handleStart = () => {
+    navigate("/PlayerChoice");
+  };
   const [characterIndex, setCharacterIndex] = useState(0);
+  const dialogContent = (
+    <div key="log">
+      <Box sx={{ width: "965px", bgcolor: "#333333" }}>
+        <Box height={2}></Box>
+        <a href={window.location.host + "/proof/" + detailID}>共有用アドレス</a>
+        <Stack>
+          <Box fontSize={25} color="white" textAlign={"start"} pt={5} pb={5}>
+            プロローグ：
+            <br />
+            {prologueText}
+          </Box>
+        </Stack>
+        {preservePictureBase64.map((picture, index) => (
+          <Stack spacing={2}>
+            <Stack direction={"row"} spacing={2}>
+              <img src={picture} alt="画像" width="400px" height="auto" />
+              <Typography variant="body1" color={"white"}>
+                {preserveText[index]}
+              </Typography>
+            </Stack>
+            <Stack direction={"row"}>
+              <Box paddingTop={4}>
+                <img src={photos.vector} alt="vector" width={35} height={40} />
+              </Box>
+
+              <Box
+                sx={{
+                  fontSize: "25px",
+                  color: "black",
+                  bgcolor: "white",
+                  padding: "20px",
+                  borderRadius: "10px",
+                }}
+              >
+                {preserveChoices[index]}
+              </Box>
+            </Stack>
+
+            <Box height={10}></Box>
+          </Stack>
+        ))}
+      </Box>
+    </div>
+  );
   const prevCharacter = () => {
     if (characterIndex > 0) {
       setCharacterIndex(characterIndex - 1);
@@ -58,8 +116,8 @@ function CharacterChoose({ playerName, setPlayerName }: charaProps) {
       const querySnapshot3 = await getDocs(q3);
       const characters = querySnapshot3.docs.map((doc) => doc.data());
 
-      console.log(characters); // コンソールにデータを出力する
-      setCharacterArray(characters); // stateを更新する
+      console.log(characters);
+      setCharacterArray(characters);
       const gameRef = collection(db, "game");
       if (characterArray != null) {
         const q = query(
@@ -68,37 +126,27 @@ function CharacterChoose({ playerName, setPlayerName }: charaProps) {
         );
 
         const querySnapshot = await getDocs(q);
-        // gamesの型をDocumentData[]にキャストする
         const games = querySnapshot.docs.map(
           (doc) => doc.data() as DocumentData
         );
 
-        // gamesの中の日付が一番短い順にソートする
-        games.sort((a, b) => a.date - b.date);
-
-        // gamesの中のdetailIDと一緒な名前を持つgame_detailの中のドキュメント名だけを取り出す
         const detailRef = collection(db, "game_detail");
-        // gamesの中のdetailIDを配列にする
         const detailIds = games.map((game) => game.detailID);
-        // detailRefからdetailIdsに含まれるドキュメント名だけをクエリする
         const q2 = query(detailRef, where("detailID", "in", detailIds));
         const querySnapshot2 = await getDocs(q2);
-        // ドキュメント名だけを配列にする
-        // detailNamesの型をstring[]にキャストする
         const detailNames = querySnapshot2.docs.map(
           (doc) => doc.data() as DocumentData
         );
         console.log(detailIds);
-        console.log(detailNames); // コンソールにデータを出力する
-        // gamesとdetailNamesというstateを更新する
+        console.log(detailNames);
         setGames(games);
         setDetailNames(detailNames);
+        setClearCount(JSON.stringify(characterArray[newIndex].clearCount));
       }
     };
-    fetchGames(); // 関数を呼び出す
+    fetchGames();
   };
 
-  // 次のキャラクターを表示する関数を定義
   const nextCharacter = () => {
     if (characterArray && characterIndex < characterArray.length - 1) {
       setCharacterIndex(characterIndex + 1);
@@ -112,8 +160,8 @@ function CharacterChoose({ playerName, setPlayerName }: charaProps) {
       const querySnapshot3 = await getDocs(q3);
       const characters = querySnapshot3.docs.map((doc) => doc.data());
 
-      console.log(characters); // コンソールにデータを出力する
-      setCharacterArray(characters); // stateを更新する
+      console.log(characters);
+      setCharacterArray(characters);
       const gameRef = collection(db, "game");
       if (characterArray != null) {
         const q = query(
@@ -122,53 +170,42 @@ function CharacterChoose({ playerName, setPlayerName }: charaProps) {
         );
 
         const querySnapshot = await getDocs(q);
-        // gamesの型をDocumentData[]にキャストする
         const games = querySnapshot.docs.map(
           (doc) => doc.data() as DocumentData
         );
 
-        // gamesの中の日付が一番短い順にソートする
         games.sort((a, b) => a.date - b.date);
 
-        // gamesの中のdetailIDと一緒な名前を持つgame_detailの中のドキュメント名だけを取り出す
         const detailRef = collection(db, "game_detail");
-        // gamesの中のdetailIDを配列にする
         const detailIds = games.map((game) => game.detailID);
-        // detailRefからdetailIdsに含まれるドキュメント名だけをクエリする
         const q2 = query(detailRef, where("detailID", "in", detailIds));
         const querySnapshot2 = await getDocs(q2);
-        // ドキュメント名だけを配列にする
-        // detailNamesの型をstring[]にキャストする
         const detailNames = querySnapshot2.docs.map(
           (doc) => doc.data() as DocumentData
         );
         console.log(detailIds);
-        console.log(detailNames); // コンソールにデータを出力する
-        // gamesとdetailNamesというstateを更新する
+        console.log(detailNames);
         setGames(games);
         setDetailNames(detailNames);
+        setClearCount(JSON.stringify(characterArray[newIndex].clearCount));
       }
     };
-    fetchGames(); // 関数を呼び出す
+    fetchGames();
   };
-
-  // gamesとdetailNamesという変数をuseStateで宣言する
-  // 初期値として空の配列を渡す
   const [games, setGames] = useState<DocumentData[]>([]);
   const [detailNames, setDetailNames] = useState<DocumentData[]>([]);
 
   useEffect(() => {
-    // useEffectを使ってデータを取得する
     setCharacterIndex(useCharacterIndex);
     const fetchGames = async () => {
-      console.log({useCharacterIndex, characterIndex})
+      console.log({ useCharacterIndex, characterIndex });
       const characterRef = collection(db, "character");
       const q3 = query(characterRef, where("email", "==", saveEmail));
       const querySnapshot3 = await getDocs(q3);
       const characters = querySnapshot3.docs.map((doc) => doc.data());
 
-      console.log(characters); // コンソールにデータを出力する
-      setCharacterArray(characters); // stateを更新する
+      console.log(characters);
+      setCharacterArray(characters);
       const gameRef = collection(db, "game");
       if (characters.length) {
         const q = query(
@@ -177,35 +214,28 @@ function CharacterChoose({ playerName, setPlayerName }: charaProps) {
         );
 
         const querySnapshot = await getDocs(q);
-        // gamesの型をDocumentData[]にキャストする
         const games = querySnapshot.docs.map(
           (doc) => doc.data() as DocumentData
         );
-
-        // gamesの中の日付が一番短い順にソートする
         games.sort((a, b) => a.date - b.date);
-
-        // gamesの中のdetailIDと一緒な名前を持つgame_detailの中のドキュメント名だけを取り出す
         const detailRef = collection(db, "game_detail");
-        // gamesの中のdetailIDを配列にする
         const detailIds = games.map((game) => game.detailID);
-        // detailRefからdetailIdsに含まれるドキュメント名だけをクエリする
         const q2 = query(detailRef, where("detailID", "in", detailIds));
         const querySnapshot2 = await getDocs(q2);
-        // ドキュメント名だけを配列にする
-        // detailNamesの型をstring[]にキャストする
         const detailNames = querySnapshot2.docs.map(
           (doc) => doc.data() as DocumentData
         );
         console.log(detailIds);
-        console.log(detailNames); // コンソールにデータを出力する
-        // gamesとdetailNamesというstateを更新する
+        console.log(detailNames);
         setGames(games);
         setDetailNames(detailNames);
+        setClearCount(JSON.stringify(characters[0].clearCount));
+      } else {
+        alert("このアカウントにはキャラクターが記録されていません。");
       }
     };
-    fetchGames(); // 関数を呼び出す
-  }, []); // 空の配列を渡して最初のレンダリング時にのみ実行する
+    fetchGames();
+  }, []);
   const changeCharaLoading = (index: number) => {
     setCharacterIndex(index);
     const fetchGames = async () => {
@@ -214,9 +244,7 @@ function CharacterChoose({ playerName, setPlayerName }: charaProps) {
       const querySnapshot3 = await getDocs(q3);
       const characters = querySnapshot3.docs.map((doc) => doc.data());
 
-      console.log(characters); // コンソールにデータを出力する
-      // 非同期関数をsetCharacterArrayの外に移動する
-      // characterArrayがnullでない場合
+      console.log(characters);
       if (characters != null) {
         const gameRef = collection(db, "game");
         const q = query(
@@ -225,38 +253,51 @@ function CharacterChoose({ playerName, setPlayerName }: charaProps) {
         );
 
         const querySnapshot = await getDocs(q);
-        // gamesの型をDocumentData[]にキャストする
         const games = querySnapshot.docs.map(
           (doc) => doc.data() as DocumentData
         );
-
-        // gamesの中の日付が一番短い順にソートする
         games.sort((a, b) => a.date - b.date);
-
-        // gamesの中のdetailIDと一緒な名前を持つgame_detailの中のドキュメント名だけを取り出す
         const detailRef = collection(db, "game_detail");
-        // gamesの中のdetailIDを配列にする
         const detailIds = games.map((game) => game.detailID);
-        // detailRefからdetailIdsに含まれるドキュメント名だけをクエリする
         const q2 = query(detailRef, where("detailID", "in", detailIds));
         const querySnapshot2 = await getDocs(q2);
-        // ドキュメント名だけを配列にする
-        // detailNamesの型をstring[]にキャストする
         const detailNames = querySnapshot2.docs.map(
           (doc) => doc.data() as DocumentData
         );
         console.log(detailIds);
-        console.log(detailNames); // コンソールにデータを出力する
-        // gamesとdetailNamesというstateを更新する
+        console.log(detailNames);
         setGames(games);
         setDetailNames(detailNames);
+        setClearCount(JSON.stringify(characters[index].clearCount));
       }
-      // setCharacterArrayを呼び出す
       setCharacterArray(characters);
     };
-    fetchGames(); // 関数を呼び出す
+    fetchGames();
   };
+  const handleClick = (detailID: string) => {
+    // detailNames配列からdetailIDと一致する要素を探す
+    const detail = detailNames.find((d) => d.detailID === detailID);
 
+    // 見つかったらその要素のプロパティを取得する
+    if (detail) {
+      const prologue = detail.Prologue;
+      const gameChoices = detail.gameChoices;
+      const gamePictures = detail.gamePictures;
+      const gameTexts = detail.gameTexts;
+
+      // 取得したプロパティを表示や処理する
+      // 例えば、console.logで確認する
+      setDetailID(detailID);
+      setPrologueText(prologue);
+      setPreservePictureBase64(gamePictures);
+      setPreserveText(gameTexts);
+      setPreserveChoices(gameChoices);
+      console.log(prologue, gameChoices, gamePictures, gameTexts);
+      setDialogWidth(1000);
+      setDialogHeight(700);
+      openDialog();
+    }
+  };
   //Styles
   const primaryText = {
     fontSize: "30px",
@@ -267,6 +308,22 @@ function CharacterChoose({ playerName, setPlayerName }: charaProps) {
     fontSize: "20px",
     color: "#9D9D9D",
   };
+
+  const background = {
+    width: "100vw",
+    height: "100vh",
+    backgroundColor: "#4D4D4D",
+    overflowX: "hidden",
+  };
+
+  const RightBar = {
+    display: "flex",
+    justifyContent: "left",
+    alignItems: "left",
+    marginTop: "15px",
+    height: "150px",
+  };
+
   const navigate = useNavigate();
 
   const adventureChoice = () => {
@@ -284,66 +341,10 @@ function CharacterChoose({ playerName, setPlayerName }: charaProps) {
     <Stack
       direction="column"
       sx={{
-        width: "100vw",
-        height: "100vh",
-        backgroundColor: "#4D4D4D",
-        overflowX: "hidden",
+        background,
       }}
     >
-      <Box
-        sx={{
-          width: "100vw",
-          height: "80px",
-          backgroundColor: "#333333",
-          paddingTop: "8px",
-          paddingLeft: "25px",
-        }}
-      >
-        <Stack direction={"row"} justifyContent="space-between">
-          <Stack direction={"row"} spacing={"50px"} marginTop={1}>
-            <img src={photos.logo} alt={"logo"} height={60} />
-            <Box>
-              <ImageToButton
-                src={photos.header_home}
-                alt={"home"}
-                onClick={home}
-                height={36}
-                width={95}
-              />
-            </Box>
-            <Box>
-              <Stack alignItems={"center"} spacing={1}>
-                <ImageToButton
-                  src={photos.header_charactar}
-                  alt={"character"}
-                  onClick={characterChoice}
-                  height={36}
-                  width={142}
-                />
-                <ImageToButton
-                  src={photos.header_bar}
-                  alt={"bar"}
-                  onClick={home}
-                  height={5}
-                />
-              </Stack>
-            </Box>
-          </Stack>
-          <Box textAlign={"center"} marginRight={"80px"} marginTop={"15px"}>
-            <Button
-              style={{
-                backgroundColor: "white",
-                color: "black",
-                fontSize: "15px",
-                width: "120px",
-                height: "80",
-              }}
-            >
-              SignOut
-            </Button>
-          </Box>
-        </Stack>
-      </Box>
+      <HomeHeader isHome={false} />
       <Stack
         paddingLeft={2}
         direction="row"
@@ -403,16 +404,8 @@ function CharacterChoose({ playerName, setPlayerName }: charaProps) {
                   label="NAME"
                   detail={characterArray[characterIndex].charaName}
                 />
-                <CharaInfoText label="冒険回数" detail="６回" />
-                <CharaInfoText label="クリア回数" detail="４回" />
-                <Box>
-                  <Box sx={{ ...seconderyText }}>
-                    <span style={{ marginLeft: "40px" }}>アイテム</span>
-                  </Box>
-                  <Box sx={{ ...primaryText }}>
-                    <span style={{ marginLeft: "60px" }}>アイテムが並ぶ</span>
-                  </Box>
-                </Box>
+                <CharaInfoText label="冒険回数" detail={clearCountSave} />
+                <Box></Box>
               </Stack>
             </Box>
           </Stack>
@@ -433,90 +426,112 @@ function CharacterChoose({ playerName, setPlayerName }: charaProps) {
                 padding: "15px 15px 15px 30px",
               }}
             >
-              <Grid container spacing={2}>
-                {characterArray &&
-                  characterArray.map((character, index) => (
-                    <Grid item key={index}>
-                      <Box
-                        bgcolor={
-                          index === characterIndex ? "#4B5855" : undefined
-                        }
-                        paddingTop={2}
-                        paddingLeft={2}
-                        paddingRight={2}
-                      >
-                        <ImageToButton
-                          src={character.chara_imgURL}
-                          alt={`キャラクター ${index}`}
-                          onClick={() => changeCharaLoading(index)}
-                          width={60}
-                          height={60}
-                        />
-                        <Box textAlign={"center"}>{character.charaName}</Box>
-                      </Box>
-                    </Grid>
-                  ))}
-              </Grid>
+              <CharaArray />
             </Box>
 
-            <Stack
-              direction="row"
-              spacing={2}
-              sx={{ width: 1000, height: 450 }}
-            >
-              <ImageToButton
-                src={photos.inner2}
-                alt="right"
-                onClick={adventureChoice}
-                width={200}
-                height={200}
-              />{" "}
-              {/* ゲーム履歴*/}
-              {games &&
-                games.map((game) => (
-                  <Box
-                    sx={{
-                      bgcolor: "#666666",
-                      width: "182px",
-                      height: "197px",
-                      marginTop: "8px",
-                      marginLeft: "58px",
-                      borderRadius: "20px",
-                    }}
-                  >
-                    <Stack
-                      key={game.id}
-                      direction="column"
-                      spacing={0}
-                      sx={{ width: 200, height: 200 }}
-                    >
-                      <Box
-                        sx={{
-                          height: "90px",
-                          width: "182px",
-                          backgroundColor: "brown",
-                          borderTopLeftRadius: "20px",
-                          borderTopRightRadius: "20px",
-                        }}
-                      ></Box>
-                      {detailNames && <Box>{"タイトル"}</Box>}
-                      <Box>{new Date(game.date).toLocaleDateString()}</Box>
-                    </Stack>
-                  </Box>
-                ))}
-              <Box
-                sx={{
-                  width: "182px",
-                  height: "200px",
-                  marginLeft: "20px",
-                }}
-              ></Box>
-            </Stack>
+            <StoryArray />
           </Stack>
         </Box>
       </Stack>
+      <Dialog width={dialogWidth} height={dialogHeight}>
+        <Box
+          sx={{
+            width: 400,
+            height: 270,
+          }}
+        >
+          {dialogContent}
+        </Box>
+      </Dialog>
     </Stack>
   );
+
+  function CharaArray() {
+    return (
+      <Grid container spacing={2} sx={{ width: 1000 }}>
+        {characterArray &&
+          characterArray.map((character, index) => (
+            <Grid item key={index}>
+              <Box
+                bgcolor={index === characterIndex ? "#4B5855" : undefined}
+                padding={1}
+              >
+                <ImageToButton
+                  src={character.chara_imgURL}
+                  alt={`キャラクター ${index}`}
+                  onClick={() => changeCharaLoading(index)}
+                  width={60}
+                  height={60}
+                />
+                <Box textAlign={"center"}>{character.charaName}</Box>
+              </Box>
+            </Grid>
+          ))}
+        <Box paddingTop={3} paddingLeft={2} paddingRight={2}>
+          <ImageToButton
+            src={photos.btn_newchar}
+            alt={"新キャラ作成"}
+            onClick={handleStart}
+            height={60}
+            width={60}
+          />
+          <Box textAlign={"center"}>{"新規作成"}</Box>
+        </Box>
+      </Grid>
+    );
+  }
+
+  function StoryArray() {
+    return (
+      <Grid container spacing={2} sx={{ width: 1000, height: 450 }}>
+        <Grid item>
+          <ImageToButton
+            src={photos.inner2}
+            alt="right"
+            onClick={adventureChoice}
+            width={200}
+            height={200}
+          />
+        </Grid>
+        {games &&
+          games.map((game) => (
+            <Grid item key={game.id}>
+              <Box
+                onClick={() => handleClick(game.detailID)}
+                sx={{
+                  bgcolor: "#666666",
+                  width: "182px",
+                  height: "197px",
+                  marginTop: "8px",
+                  borderRadius: "20px",
+                  textAlign: "center",
+                }}
+              >
+                {detailNames && (
+                  <>
+                    <Box
+                      sx={{
+                        borderTopLeftRadius: "20px",
+                        borderTopRightRadius: "20px",
+                        overflow: "hidden",
+                      }}
+                    >
+                      <img
+                        src={game.title_imgURL}
+                        alt="タイトル画像"
+                        width={"100%"}
+                      />
+                    </Box>
+                    <Box>{game.Title}</Box>
+                  </>
+                )}
+              </Box>
+            </Grid>
+          ))}
+        <Grid item sx={{ width: "182px", height: "200px" }} />
+      </Grid>
+    );
+  }
 }
 
 export default CharacterChoose;
