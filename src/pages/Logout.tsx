@@ -13,11 +13,7 @@ const Logout = ({ setIsAuth }: LogoutProps) => {
   const navigate = useNavigate();
   const logout = () => {
     // ログアウト
-    signOut(auth).then(() => {
-      // ローカルストレージからisAuth削除
-      localStorage.clear();
-      setIsAuth(false); //状態を変更
-    });
+    signOut(auth);
     // ログインにとばす
     navigate("/login");
   };

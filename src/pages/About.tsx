@@ -7,6 +7,7 @@ import { playCharacterImgContext } from "../App";
 import { getAiMessage } from "../lib/api";
 import * as OpenAIEnv from "../lib/apienv";
 import { RightGreenButton } from "./ui/buttons";
+import * as photos from "../screenPicture";
 
 type AboutProps = {
   file: File | null;
@@ -97,6 +98,27 @@ function About({
             </Stack>
           )}
         </Box>
+        <Stack
+          direction={"row"}
+          justifyContent={"center"}
+          alignContent={"center"}
+        >
+          <Stack justifyContent={"space-between"}>
+            <Box fontSize={20} padding={2}>
+              column：
+            </Box>
+            <Box fontSize={25} padding={2}>
+              この冒険に終わりはありません。冒険に満足したら
+            </Box>
+          </Stack>
+          <img src={photos.doorDetail} alt="doorDetail" height={120} />
+          <Stack justifyContent={"space-between"}>
+            <Box></Box>
+            <Box fontSize={25} padding={2}>
+              を押して、冒険の証を発行し終了してください。
+            </Box>
+          </Stack>
+        </Stack>
       </Stack>
     </div>
   );

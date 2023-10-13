@@ -6,7 +6,6 @@ import { db } from "../firebase/firebase";
 import { useDialog } from "../dialog";
 import { useNavigate } from "react-router-dom";
 import {
-
     doc,
 
     setDoc,
@@ -493,7 +492,7 @@ function GameProof({ file, preview, gameFile, playerName }: AboutProps) {
 
                             </Stack>
 
-                        ) : (
+                        ) : ( item.choice ? 
 
                             <Stack direction="row" key={index}>
 
@@ -549,7 +548,7 @@ function GameProof({ file, preview, gameFile, playerName }: AboutProps) {
 
                             </Stack>
 
-                        )
+                        : <></>)
 
                     )}
 

@@ -54,7 +54,7 @@ export function HomeHeader({ isHome }: { isHome: boolean }) {
           <Box>
             <Stack alignItems={"center"} spacing={1}>
               <ImageToButton
-                src={photos.header_charactar}
+                src={photos.header_character}
                 alt={"character"}
                 onClick={characterChoice}
                 height={36}

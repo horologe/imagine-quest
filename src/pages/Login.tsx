@@ -14,10 +14,6 @@ import * as photos from "../screenPicture";
 import { createTheme, ThemeProvider } from "@mui/material";
 import { LogInButton } from "./ui/buttons";
 
-type LoginProps = {
-    setIsAuth: (isAuth: boolean) => void;
-};
-
 const theme = createTheme({
     components: {
         MuiOutlinedInput: {
@@ -40,7 +36,7 @@ const theme = createTheme({
     },
 });
 
-const Login = ({ setIsAuth }: LoginProps) => {
+const Login = () => {
     const navigate = useNavigate();
     const [loginEmail, setLoginEmail] = useState<string>("");
     const [loginPassword, setLoginPassword] = useState<string>("");
@@ -95,9 +91,6 @@ const Login = ({ setIsAuth }: LoginProps) => {
         signInWithEmailAndPassword(auth, loginEmail, loginPassword)
             .then((result: UserCredential) => {
                 console.log(result);
-                localStorage.setItem("isAuth", "true");
-                localStorage.setItem("email", saveEmail)
-                setIsAuth(true);
                 console.log(saveEmail);
                 navigate("/");
             })
@@ -124,8 +117,6 @@ const Login = ({ setIsAuth }: LoginProps) => {
         createUserWithEmailAndPassword(auth, signupEmail, signupPassword)
             .then((result: UserCredential) => {
                 console.log(result);
-                localStorage.setItem("isAuth", "true");
-                setIsAuth(true);
                 navigate("/");
             })
             .catch((error: Error) => {

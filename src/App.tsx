@@ -1,5 +1,5 @@
 import { BrowserRouter, Route, Routes } from "react-router-dom";
-import { useState, createContext, useContext } from "react";
+import { useState, createContext, useContext, useEffect } from "react";
 // 各ページコンポーネントをインポート
 import Home from "./pages/Home";
 import About from "./pages/About";
@@ -15,6 +15,7 @@ import WorldMaking from "./pages/WorldMaking";
 import { Navigate } from "react-router-dom"; // Navigateコンポーネントをインポートする
 import Logout from "./pages/Logout";
 import ProofDetail from "./pages/ProofDetail";
+import * as firebase from "./firebase/firebase";
 
 // contextの型を定義する
 type PromptContextType = {
@@ -116,9 +117,7 @@ function App() {
   const [PlayerCharacterImg, setPlayerCharacterImg] = useState<string>("");
   const [useCharacterIndex, setUseCharacterIndex] = useState<number>(0);
   const [PromptSaveText, setPromptSaveText] = useState<string>("");
-  const [saveEmail, setSaveEmail] = useState<string>(
-    localStorage.getItem("email") || ""
-  );
+  const [saveEmail, setSaveEmail] = useState<string>("");
   const [useCharacter, setUseCharacter] = useState<string>("");
   // handleChangeFile関数を作成
   const handleChangeFile = (newFile: File | null) => {
@@ -132,9 +131,13 @@ function App() {
   };
 
   // ログイン状態を管理する
-  const [isAuth, setIsAuth] = useState<boolean>(
-    localStorage.getItem("isAuth") == "true"
-  );
+  const [isAuth, setIsAuth] = useState<boolean>();
+  useEffect(() => {
+    firebase.auth.onAuthStateChanged(user => {
+      setIsAuth(!!user);
+      setSaveEmail(user?.email || "");
+    })
+  }, [])
 
   // ルート要素を決める)
   const rootElement = (
@@ -173,7 +176,7 @@ function App() {
                             {!isAuth && (
                               <Route
                                 path="/"
-                                element={<Login setIsAuth={setIsAuth} />}
+                                element={<Login />}
                               />
                             )}
                             {/* ログインしている場合は"/login"にアクセスしたときにホーム画面にリダイレクトする */}

@@ -63,9 +63,26 @@ function CharacterChoose({ playerName, setPlayerName }: charaProps) {
     <div key="log">
       <Box sx={{ width: "965px", bgcolor: "#333333" }}>
         <Box height={2}></Box>
-        <a href={window.location.host + "/proof/" + detailID}>共有用アドレス</a>
         <Stack>
-          <Box fontSize={25} color="white" textAlign={"start"} pt={5} pb={5}>
+          <Stack direction={"row"} justifyContent={"space-between"}>
+            {" "}
+            <Box></Box>{" "}
+            <a href={window.location.host + "/proof/" + detailID}>
+              <Box
+                bgcolor={"#A8BF54"}
+                padding={2}
+                textAlign={"center"}
+                fontSize={20}
+                width={60}
+                height={30}
+                margin={2}
+              >
+                共有
+              </Box>
+            </a>
+          </Stack>
+
+          <Box fontSize={25} color="white" textAlign={"start"} pt={2} pb={5}>
             プロローグ：
             <br />
             {prologueText}
@@ -79,23 +96,32 @@ function CharacterChoose({ playerName, setPlayerName }: charaProps) {
                 {preserveText[index]}
               </Typography>
             </Stack>
-            <Stack direction={"row"}>
-              <Box paddingTop={4}>
-                <img src={photos.vector} alt="vector" width={35} height={40} />
-              </Box>
+            {preserveChoices[index] ? (
+              <Stack direction={"row"}>
+                <Box paddingTop={4}>
+                  <img
+                    src={photos.vector}
+                    alt="vector"
+                    width={35}
+                    height={40}
+                  />
+                </Box>
 
-              <Box
-                sx={{
-                  fontSize: "25px",
-                  color: "black",
-                  bgcolor: "white",
-                  padding: "20px",
-                  borderRadius: "10px",
-                }}
-              >
-                {preserveChoices[index]}
-              </Box>
-            </Stack>
+                <Box
+                  sx={{
+                    fontSize: "25px",
+                    color: "black",
+                    bgcolor: "white",
+                    padding: "20px",
+                    borderRadius: "10px",
+                  }}
+                >
+                  {preserveChoices[index]}
+                </Box>
+              </Stack>
+            ) : (
+              <></>
+            )}
 
             <Box height={10}></Box>
           </Stack>
